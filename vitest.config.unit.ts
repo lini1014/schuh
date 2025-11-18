@@ -29,7 +29,7 @@ export default defineConfig({
         // https://vitest.dev/guide/coverage
         // https://vitest.dev/config/#coverage
         coverage: {
-            include: ['src/buch/service/*'],
+            include: ['src/schuh/service/*'],
             extension: ['.mts', '.ts'],
             // default ist ['text', 'html', 'clover', 'json']
             reporter: ['text', 'html'],

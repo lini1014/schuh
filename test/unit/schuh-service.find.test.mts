@@ -17,13 +17,13 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { type Pageable } from '../../src/schuh/service/pageable.js';
 import { PrismaService } from '../../src/schuh/service/prisma-service.js';
 import {
-    type SchuhMitTitel,
+    type SchuhMitModell,
     SchuhService,
 } from '../../src/schuh/service/schuh-service.ts';
 import { type Suchparameter } from '../../src/schuh/service/suchparameter.js';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
 import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
-import { Schuhart } from '../../src/generated/prisma/enums.js';
+import { Schuhtyp } from '../../src/generated/prisma/enums.js';
 
 describe('SchuhService find', () => {
     let service: SchuhService;
@@ -46,29 +46,29 @@ describe('SchuhService find', () => {
         service = new SchuhService(prismaServiceMock, whereBuilder);
     });
 
-    test('titel vorhanden', async () => {
+    test('Modell vorhanden', async () => {
         // given
-        const titel = 'Titel';
-        const suchparameter: Suchparameter = { titel };
+        const modell = 'Adidas';
+        const suchparameter: Suchparameter = { modell };
         const pageable: Pageable = { number: 1, size: 5 };
-        const schuhMock: SchuhMitTitel = {
+        const schuhMock: SchuhMitModell = {
             id: 1,
             version: 0,
-            isbn: '978-0-007-00644-1',
-            rating: 1,
-            art: Schuhart.HARDCOVER,
+            artikelnummer: 'SH001-TEST',
+            bewertung: 1,
+            typ: Schuhtyp.Sneaker,
             preis: new Prisma.Decimal(1.1),
-            rabatt: new Prisma.Decimal(0.0123),
-            lieferbar: true,
-            datum: new Date(),
+            rabattsatz: new Prisma.Decimal(0.0123),
+            verfuegbar: true,
+            erscheinungsdatum: new Date(),
             homepage: 'https://post.rest',
-            schlagwoerter: ['JAVASCRIPT'],
-            erzeugt: new Date(),
-            aktualisiert: new Date(),
-            titel: {
+            schlagwoerter: ['SPORT'],
+            erstellt_am: new Date(),
+            aktualisiert_am: new Date(),
+            modell: {
                 id: 11,
-                titel: 'Titel',
-                untertitel: 'Untertitel',
+                modell: 'Adidas NMD',
+                farbe: 'core black',
                 schuhId: 1,
             },
         };
@@ -87,16 +87,16 @@ describe('SchuhService find', () => {
         expect(content[0]).toStrictEqual(schuhMock);
     });
 
-    test('titel nicht vorhanden', async () => {
+    test('Modell nicht vorhanden', async () => {
         // given
-        const titel = 'Titel';
-        const suchparameter: Suchparameter = { titel };
+        const modell = 'Titel';
+        const suchparameter: Suchparameter = { modell };
         const pageable: Pageable = { number: 1, size: 5 };
         (prismaServiceMock.client.schuh.findMany as any).mockResolvedValue([]);
 
         // when / then
         await expect(service.find(suchparameter, pageable)).rejects.toThrow(
-            /^Keine Buecher gefunden/,
+            /^Keine Schuhe gefunden/,
         );
     });
 });

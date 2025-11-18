@@ -66,7 +66,7 @@ pipeline {
 
                 // https://www.jenkins.io/doc/pipeline/steps/git
                 // "named arguments" statt Funktionsaufruf mit Klammern
-                git url: 'https://github.com/juergenzimmermann/buch', branch: 'main', poll: true
+                git url: 'https://github.com/juergenzimmermann/schuh', branch: 'main', poll: true
             }
         }
 
@@ -121,7 +121,7 @@ pipeline {
                 }
 
                 // /var/jenkins_home ist das Homedirectory vom User "jenkins"
-                // /var/jenkins_home/workspace/buch (siehe "pwd" oben)
+                // /var/jenkins_home/workspace/schuh (siehe "pwd" oben)
                 sh '''
                     cat package.json
                     pnpm i --prefer-frozen-lockfile
@@ -203,14 +203,14 @@ pipeline {
 
                 success {
                     script {
-                        if (fileExists("${env.WORKSPACE}/buch.zip")) {
-                            sh 'rm buch.zip'
+                        if (fileExists("${env.WORKSPACE}/schuh.zip")) {
+                            sh 'rm schuh.zip'
                         }
                     }
                     // https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/#zip-create-zip-file
-                    zip zipFile: 'buch.zip', archive: false, dir: 'dist'
-                    // jobs/buch/builds/.../archive/buch.zip
-                    archiveArtifacts 'buch.zip'
+                    zip zipFile: 'schuh.zip', archive: false, dir: 'dist'
+                    // jobs/schuh/builds/.../archive/schuh.zip
+                    archiveArtifacts 'schuh.zip'
                 }
             }
         }
@@ -219,7 +219,7 @@ pipeline {
             steps {
                 echo 'TODO: Docker-Image bauen'
                 // https://www.jenkins.io/doc/book/pipeline/docker/#building-containers
-                // def image = docker.build("juergenzimmermann/buch:${env.BUILD_ID}")
+                // def image = docker.build("juergenzimmermann/schuh:${env.BUILD_ID}")
                 // image.push()
                 // image.push('latest')
             }

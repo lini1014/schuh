@@ -50,8 +50,8 @@ export class DbPopulateService implements OnApplicationBootstrap {
         const adapter = new PrismaPg({
             connectionString: process.env['DATABASE_URL'],
         });
-        // PrismaClient fuer DB "buch" (siehe Umgebungsvariable DATABASE_URL in ".env")
-        // d.h. mit PostgreSQL-User "buch" und Schema "buch"
+        // PrismaClient fuer DB "schuh" (siehe Umgebungsvariable DATABASE_URL in ".env")
+        // d.h. mit PostgreSQL-User "schuh" und Schema "schuh"
         this.#prisma = new PrismaClient({ adapter, errorFormat: 'pretty' });
 
         const adapterAdmin = new PrismaPg({

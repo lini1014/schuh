@@ -24,7 +24,7 @@ schema {
 type Query {
   schuhe(suchparameter: SuchparameterInput): [Schuh!]
 
-  buch(id: ID!): Schuh
+  schuh(id: ID!): Schuh
 }
 
 "Funktionen, um Bücher neu anzulegen, zu aktualisieren oder zu löschen"
@@ -53,7 +53,7 @@ type Schuh {
   typ: Typ
   preis: Float!
   verfuegbar: Boolean
-  datum: String
+  erscheinungsdatum: String
   homepage: String
   schlagwoerter: [String]
   modell: Modell! # 1:1-Beziehung
@@ -62,6 +62,7 @@ type Schuh {
 
 "Enum-Typ für die Typ eines Schuhes"
 enum Typ {
+  SNEAKER
   LAUFSCHUH
   TENNISSCHUH
   SKATERSCHUH
@@ -96,7 +97,7 @@ input SchuhInput {
   preis: Float
   rabattsatz: Float
   verfuegbar: Boolean
-  datum: String
+  erscheinungsdatum: String
   homepage: String
   schlagwoerter: [String]
   modell: ModellInput!
@@ -118,7 +119,7 @@ input SchuhUpdateInput {
   preis: Float
   rabattsatz: Float
   verfuegbar: Boolean
-  datum: String
+  erscheinungsdatum: String
   homepage: String
   schlagwoerter: [String]
 }
@@ -140,3 +141,5 @@ type TokenPayload {
   refresh_token: String! # eslint-disable-line @graphql-eslint/naming-convention
   refresh_expires_in: Int! # eslint-disable-line @graphql-eslint/naming-convention
 }
+
+

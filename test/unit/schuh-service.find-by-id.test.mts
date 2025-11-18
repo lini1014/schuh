@@ -16,12 +16,12 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { PrismaService } from '../../src/schuh/service/prisma-service.js';
 import {
-    type SchuhMitTitel,
+    type SchuhMitModellUndAbbildungen,
     SchuhService,
 } from '../../src/schuh/service/schuh-service.ts';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
 import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
-import { Schuhart } from '../../src/generated/prisma/enums.js';
+import { Schuhtyp } from '../../src/generated/prisma/enums.js';
 
 describe('SchuhService findById', () => {
     let service: SchuhService;
@@ -45,26 +45,27 @@ describe('SchuhService findById', () => {
     test('id vorhanden', async () => {
         // given
         const id = 1;
-        const schuhMock: SchuhMitTitel = {
+        const schuhMock: SchuhMitModellUndAbbildungen = {
             id,
             version: 0,
-            isbn: '978-0-007-00644-1',
-            rating: 1,
-            art: Schuhart.HARDCOVER,
+            artikelnummer: 'SH001-TEST',
+            bewertung: 1,
+            typ: Schuhtyp.Sneaker,
             preis: new Prisma.Decimal(1.1),
-            rabatt: new Prisma.Decimal(0.0123),
-            lieferbar: true,
-            datum: new Date(),
+            rabattsatz: new Prisma.Decimal(0.0123),
+            verfuegbar: true,
+            erscheinungsdatum: new Date(),
             homepage: 'https://post.rest',
-            schlagwoerter: ['JAVASCRIPT'],
-            erzeugt: new Date(),
-            aktualisiert: new Date(),
-            titel: {
+            schlagwoerter: ['SPORT'],
+            erstellt_am: new Date(),
+            aktualisiert_am: new Date(),
+            modell: {
                 id: 11,
-                titel: 'Titel',
-                untertitel: 'Untertitel',
+                modell: 'Adidas NMD',
+                farbe: 'core black',
                 schuhId: id,
             },
+            abbildungen: [],
         };
         (prismaServiceMock.client.schuh.findUnique as any).mockResolvedValueOnce(
             schuhMock,

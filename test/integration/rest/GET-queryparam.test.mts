@@ -16,20 +16,20 @@
 import { HttpStatus } from '@nestjs/common';
 import BigNumber from 'bignumber.js';
 import { describe, expect, test } from 'vitest';
-import { type Page } from '../../../src/buch/controller/page.js';
-import { SchuhMitTitel } from '../../../src/buch/service/schuh-service.ts';
+import { type Page } from '../../../src/schuh/controller/page.js';
+import { SchuhMitModell } from '../../../src/schuh/service/schuh-service.ts';
 import { Schuh } from '../../../src/generated/prisma/client.js';
 import { CONTENT_TYPE, restURL } from '../constants.mjs';
 
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const titelArray = ['a', 'l', 't'];
-const titelNichtVorhanden = ['xxx', 'yyy', 'zzz'];
-const isbns = ['978-3-897-22583-1', '978-3-827-31552-6', '978-0-201-63361-0'];
-const ratingMin = [3, 4];
+const modellArray = ['nmd', 'suede', 'classic'];
+const modellNichtVorhanden = ['xxx', 'yyy', 'zzz'];
+const artikelnummern = ['SH001-ADNMD', 'SH004-PUSU', 'SH005-RECL'];
+const bewertungMin = [3, 4];
 const preisMax = [33.5, 66.6];
-const schlagwoerter = ['javascript', 'typescript'];
+const schlagwoerter = ['sport', 'streetwear'];
 const schlagwoerterNichtVorhanden = ['csharp', 'cobol'];
 
 // -----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ const schlagwoerterNichtVorhanden = ['csharp', 'cobol'];
 // -----------------------------------------------------------------------------
 // Test-Suite
 describe('GET /rest', () => {
-    test.concurrent('Alle Buecher', async () => {
+    test.concurrent('Alle Schuhe', async () => {
         // given
 
         // when
@@ -51,17 +51,17 @@ describe('GET /rest', () => {
         const body = (await response.json()) as Page<Schuh>;
 
         body.content
-            .map((buch) => buch.id)
+            .map((schuh) => schuh.id)
             .forEach((id) => {
                 expect(id).toBeDefined();
             });
     });
 
-    test.concurrent.each(titelArray)(
-        'Buecher mit Teil-Titel %s suchen',
-        async (titel) => {
+    test.concurrent.each(modellArray)(
+        'Schuhe mit Teil-Modell %s suchen',
+        async (modell) => {
             // given
-            const params = new URLSearchParams({ titel });
+            const params = new URLSearchParams({ modell });
             const url = `${restURL}?${params}`;
 
             // when
@@ -72,26 +72,26 @@ describe('GET /rest', () => {
             expect(status).toBe(HttpStatus.OK);
             expect(headers.get(CONTENT_TYPE)).toMatch(/json/iu);
 
-            const body = (await response.json()) as Page<SchuhMitTitel>;
+            const body = (await response.json()) as Page<SchuhMitModell>;
 
             expect(body).toBeDefined();
 
-            // Jedes Schuh hat einen Titel mit dem Teilstring
+            // Jedes Schuh hat ein Modell mit dem Teilstring
             body.content
-                .map((buch) => buch.titel)
+                .map((schuh) => schuh.modell)
                 .forEach((t) =>
-                    expect(t?.titel?.toLowerCase()).toStrictEqual(
-                        expect.stringContaining(titel),
+                    expect(t?.modell?.toLowerCase()).toStrictEqual(
+                        expect.stringContaining(modell),
                     ),
                 );
         },
     );
 
-    test.concurrent.each(titelNichtVorhanden)(
-        'Buecher zu nicht vorhandenem Teil-Titel %s suchen',
-        async (titel) => {
+    test.concurrent.each(modellNichtVorhanden)(
+        'Schuhe zu nicht vorhandenem Teil-Modell %s suchen',
+        async (modell) => {
             // given
-            const params = new URLSearchParams({ titel });
+            const params = new URLSearchParams({ modell });
             const url = `${restURL}?${params}`;
 
             // when
@@ -102,10 +102,12 @@ describe('GET /rest', () => {
         },
     );
 
-    test.concurrent.each(isbns)('Schuh mit ISBN %s suchen', async (isbn) => {
-        // given
-        const params = new URLSearchParams({ isbn });
-        const url = `${restURL}?${params}`;
+    test.concurrent.each(artikelnummern)(
+        'Schuh mit Artikelnummer %s suchen',
+        async (artikelnummer) => {
+            // given
+            const params = new URLSearchParams({ artikelnummer });
+            const url = `${restURL}?${params}`;
 
         // when
         const response = await fetch(url);
@@ -119,22 +121,24 @@ describe('GET /rest', () => {
 
         expect(body).toBeDefined();
 
-        // 1 Schuh mit der ISBN
-        const buecher = body.content;
+        // 1 Schuh mit der Artikelnummer
+        const schuhe = body.content;
 
-        expect(buecher).toHaveLength(1);
+        expect(schuhe).toHaveLength(1);
 
-        const [buch] = buecher;
-        const isbnFound = buch?.isbn;
+        const [schuh] = schuhe;
+        const artikelnummerFound = schuh?.artikelnummer;
 
-        expect(isbnFound).toBe(isbn);
+        expect(artikelnummerFound).toBe(artikelnummer);
     });
 
-    test.concurrent.each(ratingMin)(
-        'Buecher mit Mindest-"rating" %i suchen',
-        async (rating) => {
+    test.concurrent.each(bewertungMin)(
+        'Schuhe mit Mindest-"bewertung" %i suchen',
+        async (bewertung) => {
             // given
-            const params = new URLSearchParams({ rating: rating.toString() });
+            const params = new URLSearchParams({
+                bewertung: bewertung.toString(),
+            });
             const url = `${restURL}?${params}`;
 
             // when
@@ -147,15 +151,15 @@ describe('GET /rest', () => {
 
             const body = (await response.json()) as Page<Schuh>;
 
-            // Jedes Schuh hat eine Bewertung >= rating
+            // Jedes Schuh hat eine Bewertung >= bewertung
             body.content
-                .map((buch) => buch.rating)
-                .forEach((r) => expect(r).toBeGreaterThanOrEqual(rating));
+                .map((schuh) => schuh.bewertung)
+                .forEach((r) => expect(r).toBeGreaterThanOrEqual(bewertung));
         },
     );
 
     test.concurrent.each(preisMax)(
-        'Buecher mit max. Preis %d suchen',
+        'Schuhe mit max. Preis %d suchen',
         async (preis) => {
             // given
             const params = new URLSearchParams({ preis: preis.toString() });
@@ -173,7 +177,7 @@ describe('GET /rest', () => {
 
             // Jedes Schuh hat einen Preis <= preis
             body.content
-                .map((buch) => BigNumber(buch?.preis?.toString() ?? 0))
+                .map((schuh) => BigNumber(schuh?.preis?.toString() ?? 0))
                 .forEach((p) =>
                     expect(p.isLessThanOrEqualTo(BigNumber(preis))).toBe(true),
                 );
@@ -202,7 +206,7 @@ describe('GET /rest', () => {
 
             // Jedes Schuh hat im Array der Schlagwoerter z.B. "javascript"
             body.content
-                .map((buch) => buch.schlagwoerter)
+                .map((schuh) => schuh.schlagwoerter)
                 .forEach((schlagwoerter) =>
                     expect(schlagwoerter).toStrictEqual(
                         expect.arrayContaining([schlagwort.toUpperCase()]),
@@ -212,7 +216,7 @@ describe('GET /rest', () => {
     );
 
     test.concurrent.each(schlagwoerterNichtVorhanden)(
-        'Keine Buecher zu einem nicht vorhandenen Schlagwort',
+        'Keine Schuhe zu einem nicht vorhandenen Schlagwort',
         async (schlagwort) => {
             const params = new URLSearchParams({ [schlagwort]: 'true' });
             const url = `${restURL}?${params}`;
@@ -226,7 +230,7 @@ describe('GET /rest', () => {
     );
 
     test.concurrent(
-        'Keine Buecher zu einer nicht-vorhandenen Property',
+        'Keine Schuhe zu einer nicht-vorhandenen Property',
         async () => {
             // given
             const params = new URLSearchParams({ foo: 'bar' });

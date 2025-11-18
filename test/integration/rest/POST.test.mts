@@ -16,8 +16,8 @@
 import { HttpStatus } from '@nestjs/common';
 import BigNumber from 'bignumber.js';
 import { beforeAll, describe, expect, test } from 'vitest';
-import { type SchuhDTO } from '../../../src/buch/controller/schuh-dto.ts';
-import { SchuhService } from '../../../src/buch/service/schuh-service.ts';
+import { type SchuhDTO } from '../../../src/schuh/controller/schuh-dto.ts';
+import { SchuhService } from '../../../src/schuh/service/schuh-service.ts';
 import {
     APPLICATION_JSON,
     AUTHORIZATION,
@@ -32,22 +32,22 @@ import { getToken } from '../token.mjs';
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const neuesSchuh: Omit<SchuhDTO, 'preis' | 'rabatt'> & {
+const neuesSchuh: Omit<SchuhDTO, 'preis' | 'rabattsatz'> & {
     preis: number;
-    rabatt: number;
+    rabattsatz: number;
 } = {
-    isbn: '978-0-007-00644-1',
-    rating: 1,
-    art: 'HARDCOVER',
+    artikelnummer: 'SH999-NEU',
+    bewertung: 3,
+    typ: 'SNEAKER',
     preis: 99.99,
-    rabatt: 0.0123,
-    lieferbar: true,
-    datum: '2025-02-28T00:00:00Z',
+    rabattsatz: 0.1,
+    verfuegbar: true,
+    erscheinungsdatum: '2025-02-28',
     homepage: 'https://post.rest',
-    schlagwoerter: ['JAVASCRIPT', 'TYPESCRIPT'],
-    titel: {
-        titel: 'Titelpost',
-        untertitel: 'untertitelpos',
+    schlagwoerter: ['SPORT', 'STREETWARE'],
+    modell: {
+        modell: 'Modellpost',
+        farbe: 'rot',
     },
     abbildungen: [
         {
@@ -57,32 +57,32 @@ const neuesSchuh: Omit<SchuhDTO, 'preis' | 'rabatt'> & {
     ],
 };
 const neuesSchuhInvalid: Record<string, unknown> = {
-    isbn: 'falsche-ISBN',
-    rating: -1,
-    art: 'UNSICHTBAR',
+    artikelnummer: 'falsche-Artikelnummer',
+    bewertung: -1,
+    typ: 'UNSICHTBAR',
     preis: -1,
-    rabatt: 2,
-    lieferbar: true,
-    datum: '12345-123-123',
+    rabattsatz: 2,
+    verfuegbar: true,
+    erscheinungsdatum: '12345-123-123',
     homepage: 'anyHomepage',
-    titel: {
-        titel: '?!',
-        untertitel: 'Untertitelinvalid',
+    modell: {
+        modell: '?!',
+        farbe: 'Untermodellinvalid',
     },
 };
-const neuesSchuhIsbnExistiert: SchuhDTO = {
-    isbn: '978-3-897-22583-1',
-    rating: 1,
-    art: 'EPUB',
-    preis: new BigNumber(99.99),
-    rabatt: new BigNumber(0.09),
-    lieferbar: true,
-    datum: '2025-02-28T00:00:00Z',
-    homepage: 'https://post.isbn/',
-    schlagwoerter: ['JAVASCRIPT', 'TYPESCRIPT'],
-    titel: {
-        titel: 'Titelpostisbn',
-        untertitel: 'Untertitelpostisbn',
+const neuesSchuhArtikelnummerExistiert: SchuhDTO = {
+    artikelnummer: 'SH001-ADNMD',
+    bewertung: 4,
+    typ: 'SNEAKER',
+    preis: new BigNumber(129),
+    rabattsatz: new BigNumber(0.1),
+    verfuegbar: true,
+    erscheinungsdatum: '2024-03-15',
+    homepage: 'https://www.adidas.de/nmd',
+    schlagwoerter: ['SPORT'],
+    modell: {
+        modell: 'Adidas NMD',
+        farbe: 'core black',
     },
     abbildungen: [],
 };
@@ -141,14 +141,14 @@ describe('POST /rest', () => {
         headers.append(AUTHORIZATION, `${BEARER} ${token}`);
 
         const expectedMsg = [
-            expect.stringMatching(/^isbn /u),
-            expect.stringMatching(/^rating /u),
-            expect.stringMatching(/^art /u),
+            expect.stringMatching(/^artikelnummer /u),
+            expect.stringMatching(/^bewertung /u),
+            expect.stringMatching(/^typ /u),
             expect.stringMatching(/^preis /u),
-            expect.stringMatching(/^rabatt /u),
-            expect.stringMatching(/^datum /u),
+            expect.stringMatching(/^rabattsatz /u),
+            expect.stringMatching(/^erscheinungsdatum /u),
             expect.stringMatching(/^homepage /u),
-            expect.stringMatching(/^titel.titel /u),
+            expect.stringMatching(/^modell.modell /u),
         ];
 
         // when
@@ -171,7 +171,9 @@ describe('POST /rest', () => {
         expect(messages).toStrictEqual(expect.arrayContaining(expectedMsg));
     });
 
-    test.concurrent('Neues Schuh, aber die ISBN existiert bereits', async () => {
+    test.concurrent(
+        'Neues Schuh, aber die Artikelnummer existiert bereits',
+        async () => {
         // given
         const headers = new Headers();
         headers.append(CONTENT_TYPE, APPLICATION_JSON);
@@ -180,7 +182,7 @@ describe('POST /rest', () => {
         // when
         const response = await fetch(restURL, {
             method: POST,
-            body: JSON.stringify(neuesSchuhIsbnExistiert),
+            body: JSON.stringify(neuesSchuhArtikelnummerExistiert),
             headers,
         });
 
@@ -191,7 +193,9 @@ describe('POST /rest', () => {
 
         const body = (await response.json()) as MessageType;
 
-        expect(body.message).toStrictEqual(expect.stringContaining('ISBN'));
+        expect(body.message).toStrictEqual(
+            expect.stringContaining('Artikelnummer'),
+        );
     });
 
     test.concurrent('Neues Schuh, aber ohne Token', async () => {
