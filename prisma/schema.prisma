@@ -1,0 +1,71 @@
+generator client {
+    provider        = "prisma-client"
+    output          = "../src/generated/prisma"
+    previewFeatures = ["nativeDistinct", "relationJoins"]
+    engineType      = "client"
+  }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Abbildung {
+  id           Int    @id @default(autoincrement())
+  beschriftung String
+  contentType String @map("content_type")
+  schuhId     Int
+  schuh       Schuh  @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("abbildung")
+  @@index([schuhId])
+}
+
+model Modell {
+  id       Int     @id @default(autoincrement())
+  modell   String
+  farbe    String?
+  schuhId Int     @unique
+  schuh    Schuh   @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@map("modell")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Schuh {
+  id                Int         @id @default(autoincrement())
+  version           Int         @default(0)
+  artikelnummer     String      @unique
+  bewertung         Int
+  typ               Schuhtyp?
+  preis             Decimal     @db.Decimal(8, 2)
+  rabattsatz        Decimal     @db.Decimal(4, 3)
+  verfuegbar        Boolean     @default(false)
+  erscheinungsdatum DateTime?   @db.Date
+  homepage          String?
+  schlagwoerter     Json?
+  erstellt_am       DateTime    @default(now()) @db.Timestamp(6)
+  aktualisiert_am   DateTime    @default(now()) @db.Timestamp(6) @updatedAt
+  abbildungen       Abbildung[]
+  modell            Modell?
+  schuhFile         SchuhFile?
+
+  @@map("schuh")
+}
+
+model SchuhFile {
+  id       Int     @id @default(autoincrement())
+  data     Bytes
+  filename String
+  mimetype String?
+  schuhId Int     @unique
+  schuh    Schuh   @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  @@map("schuh_file")
+  @@index([schuhId])
+}
+
+enum Schuhtyp {
+  Sneaker         @map("SNEAKER")
+  Laufschuh
+  Freizeitschuh
+  Skateschuh
+  Tennisschuh
+}

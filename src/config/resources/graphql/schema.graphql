@@ -1,0 +1,142 @@
+# Copyright (C) 2021 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# siehe app.module.ts
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"Funktionen, um Bücherdaten zu lesen"
+type Query {
+  schuhe(suchparameter: SuchparameterInput): [Schuh!]
+
+  buch(id: ID!): Schuh
+}
+
+"Funktionen, um Bücher neu anzulegen, zu aktualisieren oder zu löschen"
+type Mutation {
+  create(input: SchuhInput!): CreatePayload
+
+  update(input: SchuhUpdateInput!): UpdatePayload
+
+  delete(id: ID!): DeletePayload
+
+  token(username: String!, password: String!): TokenPayload # Mutation, wenn z.B. der Login-Zeitpunkt im IDM-System gespeichert wird
+  refresh(refreshToken: String!): TokenPayload
+}
+
+"Daten zum Modell eines Schuhes"
+type Modell {
+  modell: String! # eslint-disable-line @graphql-eslint/no-typename-prefix
+}
+
+"Datenschema zu einem Schuh, das gelesen wird"
+type Schuh {
+  id: ID! # ID ist bei Apollo ein String
+  version: Int!
+  artikelnummer: String!
+  bewertung: Int
+  typ: Typ
+  preis: Float!
+  verfuegbar: Boolean
+  datum: String
+  homepage: String
+  schlagwoerter: [String]
+  modell: Modell! # 1:1-Beziehung
+  rabattsatz(short: Boolean): String! # field mit @ResolveField
+}
+
+"Enum-Typ für die Typ eines Schuhes"
+enum Typ {
+  LAUFSCHUH
+  TENNISSCHUH
+  SKATERSCHUH
+  FREIZEITSCHUH
+}
+
+"Suchparameter für Bücher"
+input SuchparameterInput {
+  modell: String
+  artikelnummer: String
+  bewertung: Int
+  typ: Typ
+  verfuegbar: Boolean
+}
+
+"Daten zum Modell eines neuen Schuhes"
+input ModellInput {
+  modell: String!
+}
+
+"Daten zu den Abbildungen eines Schuhes"
+input AbbildungInput {
+  beschriftung: String!
+  contentType: String!
+}
+
+"Daten für ein neues Schuh"
+input SchuhInput {
+  artikelnummer: String
+  bewertung: Int
+  typ: Typ
+  preis: Float
+  rabattsatz: Float
+  verfuegbar: Boolean
+  datum: String
+  homepage: String
+  schlagwoerter: [String]
+  modell: ModellInput!
+  abbildungen: [AbbildungInput!]
+}
+
+"Generierte ID bei erfolgreichem Neuanlegen"
+type CreatePayload {
+  id: ID
+}
+
+"Daten für ein zu änderndes Schuh"
+input SchuhUpdateInput {
+  id: ID
+  version: Int
+  artikelnummer: String
+  bewertung: Int
+  typ: Typ
+  preis: Float
+  rabattsatz: Float
+  verfuegbar: Boolean
+  datum: String
+  homepage: String
+  schlagwoerter: [String]
+}
+
+"Neue Versionsnummer als Resultat bei erfolgreichem Aktualisieren"
+type UpdatePayload {
+  version: Int
+}
+
+"Flag, ob das Loeschen durchgefuehrt wurde"
+type DeletePayload {
+  success: Boolean
+}
+
+"Access- und Refresh-Token einschliesslich Ablauf-Zeitstempel"
+type TokenPayload {
+  access_token: String! # eslint-disable-line @graphql-eslint/naming-convention
+  expires_in: Int! # eslint-disable-line @graphql-eslint/naming-convention
+  refresh_token: String! # eslint-disable-line @graphql-eslint/naming-convention
+  refresh_expires_in: Int! # eslint-disable-line @graphql-eslint/naming-convention
+}

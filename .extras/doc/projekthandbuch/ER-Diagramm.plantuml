@@ -1,0 +1,45 @@
+
+@startuml ER Diagramm
+
+hide circle
+
+skinparam linetype ortho
+
+entity "Schuh" {
+  * id: integer <<generated>>
+  --
+  * version: integer
+  * artikelnummer: text
+  * bewertung: number
+  * typ: text
+  * preis: number
+  * rabatt: number
+  * verfuegbar: boolean
+    erscheinungsdatum: date
+    homepage: text
+  * **modell_id**: integer <<FK>>
+    schlagwoerter: text
+  * erstellt_am: timestamp
+  * aktualisiert_am: timestamp
+}
+
+entity "Modell" {
+  * id: integer <<generated>>
+  --
+  * modell: text
+}
+
+entity "Abbildung" {
+  * id: integer <<generated>>
+  --
+  * beschriftung: text
+    contentType: text
+  * **schuh_id**: integer <<FK>>
+}
+
+Schuh ||..|| Modell
+Schuh ||..o{ Abbildung
+
+footer Niklas Lisker
+
+@enduml

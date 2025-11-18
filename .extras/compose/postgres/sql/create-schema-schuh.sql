@@ -1,0 +1,2 @@
+CREATE SCHEMA IF NOT EXISTS AUTHORIZATION schuh;
+ALTER ROLE schuh SET search_path = 'schuh';
