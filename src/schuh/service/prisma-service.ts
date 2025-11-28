@@ -16,20 +16,27 @@
 // https://docs.nestjs.com/recipes/prisma#use-prisma-client-in-your-nestjs-services
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../generated/prisma/client.js';
+import * as PrismaModule from '../../generated/prisma/client.js';
 import { getLogger } from '../../logger/logger.js';
 
 // https://docs.nestjs.com/recipes/prisma#use-prisma-client-in-your-nestjs-services
+const { PrismaClient } = PrismaModule;
+type PrismaClientType = PrismaModule.PrismaClient;
+
 @Injectable()
 export class PrismaService implements OnModuleInit {
     // Delegation statt Vererbung: Logging der SQL-Anweisungen kann konfiguriert werden
-    readonly client: PrismaClient;
+    readonly client: PrismaClientType;
 
     readonly #logger = getLogger(PrismaService.name);
 
     constructor() {
         // PrismaClient fuer DB "schuh" (siehe Umgebungsvariable DATABASE_URL in ".env")
         // d.h. mit PostgreSQL-User "schuh" und Schema "schuh"
+        this.#logger.debug(
+            'DATABASE_URL=%s',
+            process.env['DATABASE_URL'] ?? 'undefined',
+        );
         const adapter = new PrismaPg({
             connectionString: process.env['DATABASE_URL'],
         });

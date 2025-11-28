@@ -31,3 +31,9 @@ const resourcesSrc = join(src, 'config', 'resources');
 const resourcesDist = join(dist, src, 'config', 'resources');
 mkdirSync(resourcesDist, { recursive: true });
 cpSync(resourcesSrc, resourcesDist, { recursive: true });
+
+// Prisma-Client-Dateien im Original kopieren, damit CommonJS erhalten bleibt
+const prismaSrc = join(src, 'generated', 'prisma');
+const prismaDist = join(dist, 'generated', 'prisma');
+mkdirSync(prismaDist, { recursive: true });
+cpSync(prismaSrc, prismaDist, { recursive: true });

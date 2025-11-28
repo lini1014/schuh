@@ -64,9 +64,10 @@ if (keycloak !== undefined && keycloak !== null) {
     }
 }
 
-const schema = (keycloak?.schema as string | undefined) ?? 'https';
-const host = (keycloak?.host as string | undefined) ?? 'keycloak';
-const port = (keycloak?.port as number | undefined) ?? 8443;
+// Defaults align with local Keycloak issuing tokens at http://localhost:8880/realms/nest
+const schema = (keycloak?.schema as string | undefined) ?? 'http';
+const host = (keycloak?.host as string | undefined) ?? 'localhost';
+const port = (keycloak?.port as number | undefined) ?? 8880;
 const authServerUrl = `${schema}://${host}:${port}`;
 // Keycloak ist in Sicherheits-Bereich (= realms) unterteilt
 const realm = (keycloak?.realm as string | undefined) ?? 'nest';
@@ -85,7 +86,7 @@ export const keycloakConnectOptions: KeycloakConnectConfig = {
     secret:
         CLIENT_SECRET ??
         'ERROR: Umgebungsvariable CLIENT_SECRET nicht gesetzt!',
-    policyEnforcement: PolicyEnforcementMode.PERMISSIVE,
+    policyEnforcement: PolicyEnforcementMode.ENFORCING,
     tokenValidation,
 };
 if (NODE_ENV === 'development') {

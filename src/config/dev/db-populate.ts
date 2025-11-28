@@ -23,11 +23,14 @@
 import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import process from 'node:process';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../generated/prisma/client.js';
+import * as PrismaModule from '../../generated/prisma/client.js';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { dbPopulate, dbDir } from '../db.js';
 import { getLogger } from '../../logger/logger.js';
+
+const { PrismaClient } = PrismaModule;
+type PrismaClientType = PrismaModule.PrismaClient;
 
 /**
  * Die Test-DB wird im Development-Modus neu geladen, nachdem die Module
@@ -37,9 +40,9 @@ import { getLogger } from '../../logger/logger.js';
 export class DbPopulateService implements OnApplicationBootstrap {
     readonly #dbDir = dbDir;
 
-    readonly #prisma: PrismaClient;
+    readonly #prisma: PrismaClientType;
 
-    readonly #prismaAdmin: PrismaClient;
+    readonly #prismaAdmin: PrismaClientType;
 
     readonly #logger = getLogger(DbPopulateService.name);
 

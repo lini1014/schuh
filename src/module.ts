@@ -47,6 +47,11 @@ export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(RequestLoggerMiddleware)
-            .forRoutes(SchuhController, SchuhWriteController, 'auth', 'graphql');
+            .forRoutes(
+                SchuhController,
+                SchuhWriteController,
+                'auth',
+                'graphql',
+            );
     }
 }

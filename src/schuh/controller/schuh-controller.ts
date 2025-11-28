@@ -22,13 +22,14 @@ import {
     ApiProperty,
     ApiResponse,
     ApiTags,
+    ApiBearerAuth,
 } from '@nestjs/swagger';
 import { type Request, type Response } from 'express';
-import { Public } from 'nest-keycloak-connect';
 import { paths } from '../../config/paths.js';
-import { Schuhtyp } from '../../generated/prisma/enums.js';
+import type { $Enums } from '../../generated/prisma/client.js';
 import { getLogger } from '../../logger/logger.js';
 import { ResponseTimeInterceptor } from '../../logger/response-time.js';
+import { Public } from 'nest-keycloak-connect';
 import { createPageable } from '../service/pageable.js';
 import {
     type SchuhMitModell,
@@ -37,6 +38,8 @@ import {
 } from '../service/schuh-service.js';
 import { type Suchparameter } from '../service/suchparameter.js';
 import { createPage, Page } from './page.js';
+
+type Schuhtyp = $Enums.Schuhtyp;
 
 /**
  * Klasse für `SchuhGetController`, um Queries in _OpenAPI_ bzw. Swagger zu
@@ -101,9 +104,10 @@ export type CountResult = Record<'count', number>;
  * Die Controller-Klasse für die Verwaltung von Schuhe.
  */
 @Controller(paths.rest)
+@Public()
 @UseInterceptors(ResponseTimeInterceptor)
 @ApiTags('Schuh REST-API')
-// @ApiBearerAuth()
+@ApiBearerAuth()
 export class SchuhController {
     readonly #service: SchuhService;
 
@@ -136,7 +140,6 @@ export class SchuhController {
      */
     // eslint-disable-next-line max-params
     @Get(':id')
-    @Public()
     @ApiOperation({ summary: 'Suche mit der Schuh-ID' })
     @ApiParam({
         name: 'id',
@@ -181,9 +184,10 @@ export class SchuhController {
 
         // ETags
         const versionDb = schuh.version;
-        if (version === `"${versionDb}"`) {
+        const ifNoneMatch = this.#normalizeIfNoneMatch(version);
+        if (ifNoneMatch.includes('*') || ifNoneMatch.includes(`${versionDb}`)) {
             this.#logger.debug('getById: NOT_MODIFIED');
-            return res.sendStatus(HttpStatus.NOT_MODIFIED);
+            return res.status(HttpStatus.NOT_MODIFIED).end();
         }
         this.#logger.debug('getById: versionDb=%d', versionDb ?? -1);
         res.header('ETag', `"${versionDb}"`);
@@ -209,7 +213,6 @@ export class SchuhController {
      * @returns Leeres Promise-Objekt.
      */
     @Get()
-    @Public()
     @ApiOperation({ summary: 'Suche mit Suchparameter' })
     @ApiOkResponse({ description: 'Eine evtl. leere Liste mit Schuhen' })
     async get(
@@ -265,7 +268,6 @@ export class SchuhController {
      * @returns Leeres Promise-Objekt.
      */
     @Get('/file/:id')
-    @Public()
     @ApiOperation({ description: 'Suche nach Datei mit der Schuh-ID' })
     @ApiParam({
         name: 'id',
@@ -294,5 +296,20 @@ export class SchuhController {
             'Content-Disposition': `inline; filename="${schuhFile.filename}"`, // eslint-disable-line @typescript-eslint/naming-convention
         });
         return new StreamableFile(schuhFile.data);
+    }
+
+    #normalizeIfNoneMatch(versionHeader: string | undefined) {
+        if (versionHeader === undefined) {
+            return [];
+        }
+        const tags = versionHeader.split(',');
+        return tags
+            .map((etag) => etag.trim())
+            .map((etag) => (etag.startsWith('W/') ? etag.slice(2) : etag))
+            .map((etag) =>
+                etag.startsWith('"') && etag.endsWith('"')
+                    ? etag.slice(1, -1)
+                    : etag,
+            );
     }
 }

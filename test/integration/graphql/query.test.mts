@@ -33,12 +33,14 @@ type SchuhResponse = {
         typ: string | null;
         modell: { modell: string };
     } | null;
-    schuhe?: {
-        artikelnummer: string;
-        bewertung: number;
-        typ: string | null;
-        modell: { modell: string };
-    }[] | null;
+    schuhe?:
+        | {
+              artikelnummer: string;
+              bewertung: number;
+              typ: string | null;
+              modell: { modell: string };
+          }[]
+        | null;
 };
 
 type GraphQLResult = { data: SchuhResponse; errors?: { message: string }[] };
@@ -145,6 +147,7 @@ describe('GraphQL Queries (Schuh)', () => {
             expect(errors).toBeUndefined();
             expect(data.schuhe).toBeDefined();
             expect(data.schuhe).not.toHaveLength(0);
+
             data.schuhe!.forEach((schuh) =>
                 expect(schuh.modell.modell.toLowerCase()).toContain(
                     modell.toLowerCase(),
@@ -212,6 +215,7 @@ describe('GraphQL Queries (Schuh)', () => {
 
         expect(errors).toBeUndefined();
         expect(data.schuhe).not.toHaveLength(0);
+
         data.schuhe!.forEach((schuh) => expect(schuh.typ).toBe('LAUFSCHUH'));
     });
 

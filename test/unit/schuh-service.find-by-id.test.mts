@@ -18,7 +18,7 @@ import { PrismaService } from '../../src/schuh/service/prisma-service.js';
 import {
     type SchuhMitModellUndAbbildungen,
     SchuhService,
-} from '../../src/schuh/service/schuh-service.ts';
+} from '../../src/schuh/service/schuh-service.js';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
 import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
 import { Schuhtyp } from '../../src/generated/prisma/enums.js';

@@ -1,0 +1,76 @@
+' Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
+'
+' This program is free software: you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation, either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+' Preview durch <Alt>d
+
+@startuml Controller-Klasse
+
+interface Promise<T>
+interface Readonly<T>
+
+package @nestjs/graphql {
+  annotation Resolver
+  annotation UseInterceptors
+  annotation Query
+  annotation Args
+
+  Resolver .left[hidden].> Promise
+}
+
+package generated.prisma {
+  class Prisma
+  class SchuhGetPayload<T>
+  Prisma +-- SchuhGetPayload
+}
+
+package schuh {
+  package service {
+    class SchuhService << control >>
+  }
+
+  package graphql #DDDDDD {
+    class "type SchuhDTO = Omit<Schuh, 'abbildungen' | 'aktualisiert' | 'erzeugt'" as SchuhDTO
+    hide SchuhDTO circle
+
+    interface IdInput {
+        id: number
+    }
+
+    class SchuhQueryResolver << control >> << @Resolver() >> << @UseInterceptors() >> {
+      + @Query() async schuh(@Args() id: IdInput): Promise<Readonly<SchuhGetPayload>>
+      + @Query() async schuhe(@Args() modell: string | undefined): Promise<SchuhDTO[]>
+    }
+
+    SchuhQueryResolver o-down-> "1" SchuhService : service
+    SchuhQueryResolver ..> SchuhDTO
+    SchuhQueryResolver ..> IdInput
+    SchuhQueryResolver .up.> Resolver
+
+    SchuhQueryResolver .up.> Promise
+    SchuhQueryResolver .up.> Readonly
+
+    SchuhQueryResolver .up.> SchuhGetPayload
+
+    IdInput .down[hidden].> SchuhService
+    SchuhService .down[hidden].> Prisma
+    SchuhService .down[hidden].> SchuhGetPayload
+  }
+}
+
+hide empty members
+
+footer (c) Juergen Zimmermann
+
+@enduml

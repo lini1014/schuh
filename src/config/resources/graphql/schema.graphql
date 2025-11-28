@@ -65,7 +65,7 @@ enum Typ {
   SNEAKER
   LAUFSCHUH
   TENNISSCHUH
-  SKATERSCHUH
+  SKATESCHUH
   FREIZEITSCHUH
 }
 
@@ -141,5 +141,3 @@ type TokenPayload {
   refresh_token: String! # eslint-disable-line @graphql-eslint/naming-convention
   refresh_expires_in: Int! # eslint-disable-line @graphql-eslint/naming-convention
 }
-
-

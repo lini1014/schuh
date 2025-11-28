@@ -19,7 +19,7 @@ import { PrismaService } from '../../src/schuh/service/prisma-service.js';
 import {
     type SchuhMitModell,
     SchuhService,
-} from '../../src/schuh/service/schuh-service.ts';
+} from '../../src/schuh/service/schuh-service.js';
 import { type Suchparameter } from '../../src/schuh/service/suchparameter.js';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
 import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';

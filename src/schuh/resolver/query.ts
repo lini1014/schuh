@@ -89,4 +89,27 @@ export class SchuhQueryResolver {
         const shortStr = short === undefined || short ? '%' : 'Prozent';
         return `${rabattsatz.toString()} ${shortStr}`;
     }
+
+    @ResolveField('typ')
+    typ(@Parent() schuh: SchuhMitModell) {
+        const { typ } = schuh;
+        if (typ === null || typ === undefined) {
+            return null;
+        }
+        const normalized = typ.toLowerCase();
+        switch (normalized) {
+            case 'sneaker':
+                return 'SNEAKER';
+            case 'laufschuh':
+                return 'LAUFSCHUH';
+            case 'tennisschuh':
+                return 'TENNISSCHUH';
+            case 'freizeitschuh':
+                return 'FREIZEITSCHUH';
+            case 'skateschuh':
+                return 'SKATESCHUH';
+            default:
+                return null;
+        }
+    }
 }

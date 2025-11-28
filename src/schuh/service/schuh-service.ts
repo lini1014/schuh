@@ -4,7 +4,7 @@
  */
 
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
+import type {
     Prisma,
     PrismaClient,
     SchuhFile,
@@ -262,14 +262,16 @@ export class SchuhService {
             '#checkEnums: Suchparameter "typ=%s"',
             typ ?? 'undefined',
         );
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typ === undefined) {
+            return true;
+        }
+        const typLower = typ.toLowerCase();
         return (
-            typ === undefined ||
-            typ === 'Sneaker' ||
-            typ === 'Laufschuh' ||
-            typ === 'Tennisschuh' ||
-            typ === 'Freizeitschuh' ||
-            typ === 'Skateschuh'
+            typLower === 'sneaker' ||
+            typLower === 'laufschuh' ||
+            typLower === 'tennisschuh' ||
+            typLower === 'freizeitschuh' ||
+            typLower === 'skateschuh'
         );
     }
 }

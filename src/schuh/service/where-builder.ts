@@ -5,9 +5,12 @@
 
 import { Injectable } from '@nestjs/common';
 import { type SchuhWhereInput } from '../../generated/prisma/models/Schuh.js';
-import { Prisma, Schuhtyp } from '../../generated/prisma/client.js';
+import * as PrismaModule from '../../generated/prisma/client.js';
 import { getLogger } from '../../logger/logger.js';
 import { type Suchparameter } from './suchparameter.js';
+
+const { Prisma, $Enums } = PrismaModule;
+type Schuhtyp = PrismaModule.$Enums.Schuhtyp;
 
 /** Typdefinitionen für die Suche mit der Schuh-ID. */
 export type BuildIdParams = {
@@ -32,12 +35,7 @@ export class WhereBuilder {
      */
     // "rest properties" ab ES 2018 https://github.com/tc39/proposal-object-rest-spread
     // eslint-disable-next-line max-lines-per-function, prettier/prettier, sonarjs/cognitive-complexity
-    build({
-        sport,
-        streetware,
-        vintage,
-        ...restProps
-    }: Suchparameter) {
+    build({ sport, streetware, vintage, ...restProps }: Suchparameter) {
         this.#logger.debug(
             'build: sport=%s, vintage=%s, streetware=%s, restProps=%o',
             vintage ?? 'undefined',
@@ -59,7 +57,6 @@ export class WhereBuilder {
                 case 'modell':
                     where.modell = {
                         modell: {
-
                             contains: value as string,
                             mode: Prisma.QueryMode.insensitive,
                         },
@@ -81,8 +78,13 @@ export class WhereBuilder {
                     }
                     break;
                 case 'typ':
-                    // enum
-                    where.typ = { equals: value as Schuhtyp };
+                    // enum, case-insensitive
+                    if (typeof value === 'string') {
+                        const mapped = this.#mapTyp(value);
+                        if (mapped !== undefined) {
+                            where.typ = { equals: mapped };
+                        }
+                    }
                     break;
                 case 'verfuegbar':
                     // boolean
@@ -91,7 +93,9 @@ export class WhereBuilder {
                     };
                     break;
                 case 'erscheinungsdatum':
-                    where.erscheinungsdatum = { gte: new Date(value as string) };
+                    where.erscheinungsdatum = {
+                        gte: new Date(value as string),
+                    };
                     break;
                 case 'homepage':
                     where.homepage = { equals: value as string };
@@ -104,9 +108,24 @@ export class WhereBuilder {
             vintage,
             streetware,
         });
-        if (schlagwoerter.length >= 0) {
-            // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-json-fields#json-object-arrays
-            where.schlagwoerter = { array_contains: schlagwoerter };
+        if (schlagwoerter.length > 0) {
+            // allow case-insensitive matching by checking lower/upper variants
+            const tags = new Set(
+                schlagwoerter.flatMap((tag) => [
+                    tag,
+                    tag.toLowerCase(),
+                    tag.toUpperCase(),
+                ]),
+            );
+            const tagConditions = Array.from(tags).map((tag) => ({
+                schlagwoerter: { array_contains: [tag] },
+            }));
+            where =
+                Object.keys(where).length === 0
+                    ? { OR: tagConditions }
+                    : {
+                          AND: [where, { OR: tagConditions }],
+                      };
         }
 
         this.#logger.debug('build: where=%o', where);
@@ -124,14 +143,33 @@ export class WhereBuilder {
     }): ReadonlyArray<string> {
         const schlagwoerter: string[] = [];
         if (sport?.toLowerCase() === 'true') {
-            schlagwoerter.push('SPORT');
+            schlagwoerter.push('sport');
         }
         if (vintage?.toLowerCase() === 'true') {
-            schlagwoerter.push('STREETWARE');
+            schlagwoerter.push('vintage');
         }
         if (streetware?.toLowerCase() === 'true') {
-            schlagwoerter.push('VINTAGE');
+            // DB-Wert lautet "streetwear"
+            schlagwoerter.push('streetwear');
         }
         return schlagwoerter;
+    }
+
+    #mapTyp(value: string): Schuhtyp | undefined {
+        const normalized = value.toLowerCase();
+        switch (normalized) {
+            case 'sneaker':
+                return $Enums.Schuhtyp.Sneaker;
+            case 'laufschuh':
+                return $Enums.Schuhtyp.Laufschuh;
+            case 'tennisschuh':
+                return $Enums.Schuhtyp.Tennisschuh;
+            case 'freizeitschuh':
+                return $Enums.Schuhtyp.Freizeitschuh;
+            case 'skateschuh':
+                return $Enums.Schuhtyp.Skateschuh;
+            default:
+                return undefined;
+        }
     }
 }

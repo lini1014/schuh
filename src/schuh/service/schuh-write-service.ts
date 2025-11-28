@@ -21,10 +21,10 @@
 
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { fileTypeFromBuffer } from 'file-type';
-import {
+import type {
     PrismaClient,
+    Prisma,
     SchuhFile,
-    type Prisma,
 } from '../../generated/prisma/client.js';
 import { getLogger } from '../../logger/logger.js';
 import { MailService } from '../../mail/mail-service.js';
@@ -124,7 +124,7 @@ export class SchuhWriteService {
     // eslint-disable-next-line max-params
     async addFile(
         schuhId: number,
-        data: Uint8Array<ArrayBufferLike>,
+        data: Uint8Array,
         filename: string,
         size: number,
     ): Promise<Readonly<SchuhFile> | undefined> {
@@ -153,13 +153,16 @@ export class SchuhWriteService {
             // evtl. vorhandene Datei löschen
             await tx.schuhFile.deleteMany({ where: { schuhId } });
 
-            const fileType = await fileTypeFromBuffer(data);
+            // In einen "normalen" Uint8Array mit ArrayBuffer konvertieren, damit Prisma-Typen passen.
+            const binaryData = new Uint8Array(data);
+
+            const fileType = await fileTypeFromBuffer(binaryData);
             const mimetype = fileType?.mime ?? null;
             this.#logger.debug('addFile: mimetype=%s', mimetype ?? 'undefined');
 
             const schuhFile: SchuhFileCreate = {
                 filename,
-                data,
+                data: binaryData,
                 mimetype,
                 schuhId,
             };

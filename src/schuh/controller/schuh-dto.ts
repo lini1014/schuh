@@ -25,9 +25,11 @@ import {
     ValidatorConstraint,
     type ValidatorConstraintInterface,
 } from 'class-validator';
-import { Schuhtyp } from '../../generated/prisma/enums.js';
+import type { $Enums } from '../../generated/prisma/client.js';
 import { AbbildungDTO } from './abbildung-dto.js';
 import { ModellDTO } from './modell-dto.js';
+
+type Schuhtyp = $Enums.Schuhtyp;
 
 export const MAX_BEWERTUNG = 5;
 
@@ -93,7 +95,7 @@ export class SchuhDtoOhneRef {
     @ApiProperty({ example: 5, type: Number })
     readonly bewertung!: number;
 
-    @Matches(/^(SNEAKER|LAUFSCHUH|TENNISSCHUH|SKATESCHUH|FREIZEITSCHUH)$/u)
+    @Matches(/^(sneaker|laufschuh|tennisschuh|skateschuh|freizeitschuh)$/iu)
     @IsOptional()
     @ApiProperty({ example: 'VINTAGE', type: String })
     readonly typ: Schuhtyp | undefined;

@@ -1,32 +1,37 @@
 generator client {
-    provider        = "prisma-client"
-    output          = "../src/generated/prisma"
-    previewFeatures = ["nativeDistinct", "relationJoins"]
-    engineType      = "client"
-  }
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["nativeDistinct", "relationJoins"]
+  engineType      = "client"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["schuh"]
 }
 
 model Abbildung {
   id           Int    @id @default(autoincrement())
   beschriftung String
-  contentType String @map("content_type")
-  schuhId     Int
-  schuh       Schuh  @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  contentType  String @map("content_type")
+  schuhId      Int    @map("schuh_id")
+  schuh        Schuh  @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@map("abbildung")
   @@index([schuhId])
+  @@map("abbildung")
+  @@schema("schuh")
 }
 
 model Modell {
-  id       Int     @id @default(autoincrement())
-  modell   String
-  farbe    String?
-  schuhId Int     @unique
-  schuh    Schuh   @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id      Int     @id @default(autoincrement())
+  modell  String
+  farbe   String?
+  schuhId Int     @unique @map("schuh_id")
+  schuh   Schuh   @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@map("modell")
+  @@schema("schuh")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -43,12 +48,13 @@ model Schuh {
   homepage          String?
   schlagwoerter     Json?
   erstellt_am       DateTime    @default(now()) @db.Timestamp(6)
-  aktualisiert_am   DateTime    @default(now()) @db.Timestamp(6) @updatedAt
+  aktualisiert_am   DateTime    @default(now()) @updatedAt @db.Timestamp(6)
   abbildungen       Abbildung[]
   modell            Modell?
   schuhFile         SchuhFile?
 
   @@map("schuh")
+  @@schema("schuh")
 }
 
 model SchuhFile {
@@ -56,16 +62,21 @@ model SchuhFile {
   data     Bytes
   filename String
   mimetype String?
-  schuhId Int     @unique
+  schuhId  Int     @unique @map("schuh_id")
   schuh    Schuh   @relation(fields: [schuhId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  @@map("schuh_file")
+
   @@index([schuhId])
+  @@map("schuh_file")
+  @@schema("schuh")
 }
 
 enum Schuhtyp {
-  Sneaker         @map("SNEAKER")
+  Sneaker
   Laufschuh
   Freizeitschuh
   Skateschuh
   Tennisschuh
+
+  @@map("schuhtyp")
+  @@schema("schuh")
 }

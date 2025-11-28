@@ -6,6 +6,8 @@
     "__tests__",
     "dist",
     "**/*spec.ts",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "src/generated/prisma/**/*.ts",
+    "src/generated/prisma/**/*.mts"
   ]
 }

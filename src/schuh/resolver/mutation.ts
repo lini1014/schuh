@@ -21,6 +21,7 @@ import { AuthGuard, Roles } from 'nest-keycloak-connect';
 import { getLogger } from '../../logger/logger.js';
 import { ResponseTimeInterceptor } from '../../logger/response-time.js';
 import { SchuhDTO } from '../controller/schuh-dto.js';
+import { $Enums } from '../../generated/prisma/client.js';
 import {
     SchuhCreate,
     SchuhUpdate,
@@ -127,11 +128,14 @@ export class SchuhMutationResolver {
             version: 0,
             artikelnummer: schuhDTO.artikelnummer,
             bewertung: schuhDTO.bewertung,
-            typ: schuhDTO.typ ?? null,
+            typ: this.#mapTyp(schuhDTO.typ),
             preis: schuhDTO.preis.toNumber(),
             rabattsatz: schuhDTO.rabattsatz?.toNumber() ?? 0,
             verfuegbar: schuhDTO.verfuegbar ?? false,
-            erscheinungsdatum: schuhDTO.erscheinungsdatum ?? null,
+            erscheinungsdatum:
+                schuhDTO.erscheinungsdatum === undefined
+                    ? null
+                    : new Date(schuhDTO.erscheinungsdatum),
             homepage: schuhDTO.homepage ?? null,
             schlagwoerter: schuhDTO.schlagwoerter ?? [],
             modell: {
@@ -148,13 +152,36 @@ export class SchuhMutationResolver {
         return {
             artikelnummer: schuhDTO.artikelnummer,
             bewertung: schuhDTO.bewertung,
-            typ: schuhDTO.typ ?? null,
+            typ: this.#mapTyp(schuhDTO.typ),
             preis: schuhDTO.preis.toNumber(),
             rabattsatz: schuhDTO.rabattsatz?.toNumber() ?? 0,
             verfuegbar: schuhDTO.verfuegbar ?? false,
-            erscheinungsdatum: schuhDTO.erscheinungsdatum ?? null,
+            erscheinungsdatum:
+                schuhDTO.erscheinungsdatum === undefined
+                    ? null
+                    : new Date(schuhDTO.erscheinungsdatum),
             homepage: schuhDTO.homepage ?? null,
             schlagwoerter: schuhDTO.schlagwoerter ?? [],
         };
+    }
+
+    #mapTyp(typ: string | null | undefined) {
+        if (typ === null || typ === undefined) {
+            return null;
+        }
+        switch (typ.toUpperCase()) {
+            case 'SNEAKER':
+                return $Enums.Schuhtyp.Sneaker;
+            case 'LAUFSCHUH':
+                return $Enums.Schuhtyp.Laufschuh;
+            case 'TENNISSCHUH':
+                return $Enums.Schuhtyp.Tennisschuh;
+            case 'FREIZEITSCHUH':
+                return $Enums.Schuhtyp.Freizeitschuh;
+            case 'SKATESCHUH':
+                return $Enums.Schuhtyp.Skateschuh;
+            default:
+                return null;
+        }
     }
 }

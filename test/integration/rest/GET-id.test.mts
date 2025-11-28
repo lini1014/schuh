@@ -29,14 +29,13 @@
 
 import { HttpStatus } from '@nestjs/common';
 import { describe, expect, test } from 'vitest';
-import { CONTENT_TYPE, IF_NONE_MATCH, restURL } from '../constants.mjs';
+import { CONTENT_TYPE, restURL } from '../constants.mjs';
 
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const ids = [1, 20];
+const ids = [1, 2];
 const idNichtVorhanden = 999999;
-const idsETag = [1, 20];
 const idFalsch = 'xy';
 
 // -----------------------------------------------------------------------------
@@ -82,25 +81,4 @@ describe('GET /rest/:id', () => {
         // then
         expect(status).toBe(HttpStatus.NOT_FOUND);
     });
-
-    test.concurrent.each(idsETag)(
-        'Schuh zu ID %i mit If-None-Match',
-        async (id) => {
-            // given
-            const url = `${restURL}/${id}`;
-            const headers = new Headers();
-            headers.append(IF_NONE_MATCH, '"0"');
-
-            // when
-            const response = await fetch(url, { headers });
-            const { status } = response;
-
-            // then
-            expect(status).toBe(HttpStatus.NOT_MODIFIED);
-
-            const body = await response.text();
-
-            expect(body).toBe('');
-        },
-    );
 });

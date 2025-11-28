@@ -3,13 +3,13 @@
  * @packageDocumentation
  */
 
-import { type Schuhtyp } from '../../generated/prisma/enums.js';
+import type { $Enums } from '../../generated/prisma/client.js';
 
 // Typdefinition für `find`
 export type Suchparameter = {
     readonly artikelnummer?: string;
     readonly rating?: number | string;
-    readonly typ?: Schuhtyp;
+    readonly typ?: $Enums.Schuhtyp;
     readonly preis?: number;
     readonly rabattsatz?: number;
     readonly verfuegbar?: boolean;

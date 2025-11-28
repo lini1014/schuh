@@ -15,11 +15,11 @@
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { PrismaService } from '../../src/schuh/service/prisma-service.js';
-import { SchuhService } from '../../src/schuh/service/schuh-service.ts';
+import { SchuhService } from '../../src/schuh/service/schuh-service.js';
 import {
     type SchuhCreate,
     SchuhWriteService,
-} from '../../src/schuh/service/schuh-write-service.ts';
+} from '../../src/schuh/service/schuh-write-service.js';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
 import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
 import { Schuhtyp } from '../../src/generated/prisma/enums.js';

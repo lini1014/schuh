@@ -49,7 +49,9 @@
 
     // !!!auskommentieren fuer Nest
     //"allowImportingTsExtensions": true,
-    "erasableSyntaxOnly": true // NICHT: enum, parameter properties in constructor(), namespace, import aliases
+    //"erasableSyntaxOnly": true, // NICHT: enum, parameter properties in constructor(), namespace, import aliases
+    // Prisma generiert grosse .js-Dateien, die nicht im strictest-Modus geprueft werden muessen
+    "checkJs": false
 
     // "useUnknownInCatchVariables": true // unknown als default-Typ bei catch-Klauseln, default bei strict
   }

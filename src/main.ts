@@ -51,7 +51,9 @@ const setupSwagger = (app: INestApplication) => {
         .addBearerAuth()
         .build();
     const document = SwaggerModule.createDocument(app, config);
-    const options: SwaggerCustomOptions = { customSiteTitle: 'Schuh 2025.10.1' };
+    const options: SwaggerCustomOptions = {
+        customSiteTitle: 'Schuh 2025.10.1',
+    };
     SwaggerModule.setup(paths.swagger, app, document, options);
 };
 

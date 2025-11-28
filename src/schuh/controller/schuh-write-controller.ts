@@ -36,7 +36,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { type Request, type Response } from 'express';
-import { AuthGuard, Public, Roles } from 'nest-keycloak-connect';
+import { AuthGuard, Roles } from 'nest-keycloak-connect';
 import { paths } from '../../config/paths.js';
 import { getLogger } from '../../logger/logger.js';
 import { ResponseTimeInterceptor } from '../../logger/response-time.js';
@@ -137,8 +137,7 @@ export class SchuhWriteController {
      */
     // eslint-disable-next-line max-params
     @Post(':id')
-    @Public()
-    // @Roles({ roles: ['admin']})
+    @Roles('admin', 'user')
     @UseInterceptors(FileInterceptor('file', MULTER_OPTIONS))
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Binärdatei mit einem Bild hochladen' })
