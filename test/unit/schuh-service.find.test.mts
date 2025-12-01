@@ -22,8 +22,9 @@ import {
 } from '../../src/schuh/service/schuh-service.js';
 import { type Suchparameter } from '../../src/schuh/service/suchparameter.js';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
-import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
-import { Schuhtyp } from '../../src/generated/prisma/enums.js';
+import * as PrismaModule from '../../src/generated/prisma/client.js';
+const { Prisma, PrismaClient, $Enums } = PrismaModule;
+const { Schuhtyp } = $Enums;
 
 describe('SchuhService find', () => {
     let service: SchuhService;

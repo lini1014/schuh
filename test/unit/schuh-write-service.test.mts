@@ -21,8 +21,9 @@ import {
     SchuhWriteService,
 } from '../../src/schuh/service/schuh-write-service.js';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
-import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
-import { Schuhtyp } from '../../src/generated/prisma/enums.js';
+import * as PrismaModule from '../../src/generated/prisma/client.js';
+const { Prisma, PrismaClient, $Enums } = PrismaModule;
+const { Schuhtyp } = $Enums;
 import { MailService } from '../../src/mail/mail-service.js';
 
 describe('SchuhWriteService create', () => {
@@ -111,4 +112,3 @@ describe('SchuhWriteService create', () => {
         expect(id).toBe(idMock);
     });
 });
-

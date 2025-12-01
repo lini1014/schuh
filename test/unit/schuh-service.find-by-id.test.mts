@@ -20,15 +20,16 @@ import {
     SchuhService,
 } from '../../src/schuh/service/schuh-service.js';
 import { WhereBuilder } from '../../src/schuh/service/where-builder.js';
-import { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
-import { Schuhtyp } from '../../src/generated/prisma/enums.js';
+import * as PrismaModule from '../../src/generated/prisma/client.js';
+const { Prisma, $Enums } = PrismaModule;
+const { Schuhtyp } = $Enums;
 
 describe('SchuhService findById', () => {
     let service: SchuhService;
     let prismaServiceMock: PrismaService;
 
     beforeEach(() => {
-        const findUniqueMock = vi.fn<PrismaClient['schuh']['findUnique']>();
+        const findUniqueMock = vi.fn<any>();
         prismaServiceMock = {
             client: {
                 schuh: {
