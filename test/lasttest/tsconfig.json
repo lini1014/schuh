@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["script.ts", "isbn_generate.ts"],
+  "include": ["script.ts", "artikelnummer_generate.ts"],
   "compilerOptions": {
     // https://www.typescriptlang.org/tsconfig/#isolatedModules
     "isolatedModules": true
