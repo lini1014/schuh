@@ -36,7 +36,7 @@
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 nest build",
     "postbuild": "node scripts/copy-resources.mts",
     "start": "node --env-file=.env dist/main.js",
-    "pre:dev": "pnpm run copy-resources",
+    "pre:dev": "node scripts/copy-resources.mts",
     "dev": "nest start --env-file=.env --watch",
     "test": "set LOG_LEVEL=info&& vitest --ui",
     "test:unit": "vitest -c ./vitest.config.unit.ts --ui",

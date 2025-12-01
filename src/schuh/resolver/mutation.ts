@@ -21,7 +21,7 @@ import { AuthGuard, Roles } from 'nest-keycloak-connect';
 import { getLogger } from '../../logger/logger.js';
 import { ResponseTimeInterceptor } from '../../logger/response-time.js';
 import { SchuhDTO } from '../controller/schuh-dto.js';
-import { $Enums } from '../../generated/prisma/client.js';
+import * as PrismaModule from '../../generated/prisma/client.js';
 import {
     SchuhCreate,
     SchuhUpdate,
@@ -39,6 +39,8 @@ import { type IdInput } from './query.js';
 //  GraphQL AuthZ
 //      https://github.com/AstrumU/graphql-authz
 //      https://www.the-guild.dev/blog/graphql-authz
+
+const { $Enums } = PrismaModule;
 
 export type CreatePayload = {
     readonly id: number;

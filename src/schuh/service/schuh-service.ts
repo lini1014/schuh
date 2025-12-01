@@ -4,18 +4,17 @@
  */
 
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type {
-    Prisma,
-    PrismaClient,
-    SchuhFile,
-} from '../../generated/prisma/client.js';
-import { type SchuhInclude } from '../../generated/prisma/models/Schuh.js';
+import * as PrismaModule from '../../generated/prisma/client.js';
 import { getLogger } from '../../logger/logger.js';
 import { type Pageable } from './pageable.js';
 import { PrismaService } from './prisma-service.js';
 import { type Slice } from './slice.js';
 import { type Suchparameter, suchparameterNamen } from './suchparameter.js';
 import { WhereBuilder } from './where-builder.js';
+
+type PrismaClient = PrismaModule.PrismaClient;
+type SchuhFile = PrismaModule.SchuhFile;
+type SchuhInclude = PrismaModule.Prisma.SchuhInclude;
 
 // Typdefinition für `findById`
 type FindByIdParams = {
@@ -25,11 +24,11 @@ type FindByIdParams = {
     readonly mitAbbildungen?: boolean;
 };
 
-export type SchuhMitModell = Prisma.SchuhGetPayload<{
+export type SchuhMitModell = PrismaModule.Prisma.SchuhGetPayload<{
     include: { modell: true };
 }>;
 
-export type SchuhMitModellUndAbbildungen = Prisma.SchuhGetPayload<{
+export type SchuhMitModellUndAbbildungen = PrismaModule.Prisma.SchuhGetPayload<{
     include: {
         modell: true;
         abbildungen: true;

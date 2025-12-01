@@ -4,13 +4,13 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { type SchuhWhereInput } from '../../generated/prisma/models/Schuh.js';
 import * as PrismaModule from '../../generated/prisma/client.js';
 import { getLogger } from '../../logger/logger.js';
 import { type Suchparameter } from './suchparameter.js';
 
 const { Prisma, $Enums } = PrismaModule;
 type Schuhtyp = PrismaModule.$Enums.Schuhtyp;
+type SchuhWhereInput = PrismaModule.Prisma.SchuhWhereInput;
 
 /** Typdefinitionen für die Suche mit der Schuh-ID. */
 export type BuildIdParams = {
