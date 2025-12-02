@@ -90,6 +90,14 @@ export class SchuhQueryResolver {
         return `${rabattsatz.toString()} ${shortStr}`;
     }
 
+    @ResolveField('erscheinungsdatum')
+    erscheinungsdatum(@Parent() schuh: SchuhMitModell) {
+        // Nur das ISO-Datum ohne Zeitanteil zurückgeben
+        return schuh.erscheinungsdatum
+            ? schuh.erscheinungsdatum.toISOString().slice(0, 10)
+            : null;
+    }
+
     @ResolveField('typ')
     typ(@Parent() schuh: SchuhMitModell) {
         const { typ } = schuh;

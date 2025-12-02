@@ -193,7 +193,7 @@ export class SchuhController {
         res.header('ETag', `"${versionDb}"`);
 
         this.#logger.debug('getById: schuh=%o', schuh);
-        return res.json(schuh);
+        return res.json(this.#mapErscheinungsdatum(schuh));
     }
 
     /**
@@ -256,7 +256,15 @@ export class SchuhController {
         const schuhPage = createPage(schuheSlice, pageable);
         this.#logger.debug('get: schuhPage=%o', schuhPage);
 
-        return res.json(schuhPage).send();
+        const content = schuhPage.content.map((schuh) =>
+            this.#mapErscheinungsdatum(schuh),
+        );
+        return res
+            .json({
+                ...schuhPage,
+                content,
+            })
+            .send();
     }
 
     /**
@@ -311,5 +319,16 @@ export class SchuhController {
                     ? etag.slice(1, -1)
                     : etag,
             );
+    }
+
+    #mapErscheinungsdatum<
+        T extends { erscheinungsdatum?: Date | string | null },
+    >(schuh: T): T & { erscheinungsdatum: string | null } {
+        const date = schuh.erscheinungsdatum;
+        const erscheinungsdatum =
+            date instanceof Date
+                ? date.toISOString().slice(0, 10)
+                : date ?? null;
+        return { ...schuh, erscheinungsdatum };
     }
 }

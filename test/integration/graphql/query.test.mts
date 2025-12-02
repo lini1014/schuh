@@ -31,6 +31,7 @@ type SchuhResponse = {
         artikelnummer: string;
         bewertung: number;
         typ: string | null;
+        erscheinungsdatum?: string | null;
         modell: { modell: string };
     } | null;
     schuhe?:
@@ -66,6 +67,7 @@ describe('GraphQL Queries (Schuh)', () => {
                         artikelnummer
                         bewertung
                         typ
+                        erscheinungsdatum
                         modell {
                             modell
                         }
@@ -88,6 +90,9 @@ describe('GraphQL Queries (Schuh)', () => {
         expect(data.schuh).toBeDefined();
         expect(data.schuh?.artikelnummer).toMatch(/^SH00/iu);
         expect(data.schuh?.modell.modell).toMatch(/^\w/iu);
+        const erscheinungsdatum = data.schuh?.erscheinungsdatum;
+        expect(erscheinungsdatum).toBeDefined();
+        expect(erscheinungsdatum).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
 
     test('Schuh zu nicht vorhandener ID', async () => {

@@ -53,13 +53,11 @@ const neuesSchuh: Omit<SchuhDTO, 'preis' | 'rabattsatz'> & {
     ],
 };
 
-
 // -----------------------------------------------------------------------------
 // T e s t s
 // -----------------------------------------------------------------------------
 // Test-Suite
 describe('POST /rest', () => {
-
     test.concurrent('Neues Schuh, aber ohne Token', async () => {
         // when
         const { status } = await fetch(restURL, {

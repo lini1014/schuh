@@ -40,7 +40,9 @@ const key = open(`${tlsDir}/key.pem`);
 
 // Holt Token und triggert db_populate
 export function setup() {
-    const tokenHeaders = { 'Content-Type': 'application/x-www-form-urlencoded' };
+    const tokenHeaders = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+    };
     const body = 'username=admin&password=p';
     const tokenResponse = http.post<'text'>(tokenUrl, body, {
         headers: tokenHeaders,
