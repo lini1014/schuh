@@ -90,7 +90,9 @@ describe('GraphQL Queries (Schuh)', () => {
         expect(data.schuh).toBeDefined();
         expect(data.schuh?.artikelnummer).toMatch(/^SH00/iu);
         expect(data.schuh?.modell.modell).toMatch(/^\w/iu);
+
         const erscheinungsdatum = data.schuh?.erscheinungsdatum;
+
         expect(erscheinungsdatum).toBeDefined();
         expect(erscheinungsdatum).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });

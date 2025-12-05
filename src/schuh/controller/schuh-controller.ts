@@ -328,7 +328,7 @@ export class SchuhController {
         const erscheinungsdatum =
             date instanceof Date
                 ? date.toISOString().slice(0, 10)
-                : date ?? null;
+                : (date ?? null);
         return { ...schuh, erscheinungsdatum };
     }
 }
